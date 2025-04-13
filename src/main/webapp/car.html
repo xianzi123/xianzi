@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>车辆信息</title>
+  <script src="js/jquery.min.js"></script>
+  <script>
+    $(function (){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=")+1);
+      $("#uid").val(uid);
+      //查询
+      $.ajax({
+        url:"getCar",
+        type:"post",
+        data:{uid:uid},
+        success:function (data){
+          if (data != null){
+            $("#car1").remove();
+            let p1 = $("<p>车辆编号："+data.cid+"</p>");
+            let p2 = $("<p>车型："+data.carBrand+"</p>");
+            let p3 = $("<p>颜色："+data.color+"</p>");
+            let p4 = $("<p>车牌："+data.plateNumber+"</p>");
+            let p5 = $("<p>车主："+data.uname+"</p>");
+            let p6 = $("<p>状态："+data.state+"</p>");
+            let p7 = $("<button onclick='editCar()'>修改</button>")
+            $("#car").append(p1);
+            $("#car").append(p2);
+            $("#car").append(p3);
+            $("#car").append(p4);
+            $("#car").append(p5);
+            $("#car").append(p6);
+            $("#car").append(p7);
+          }
+        },
+        error:function (){
+          alert("请先完善车辆信息");
+        },
+        dataType:"json"
+      })
+      //添加
+      $("#addCar").click(function (){
+        var obj = $("#car1").serialize();
+        $.ajax({
+          url:"addCar",
+          type:"post",
+          data:obj,
+          success(data){
+            alert(data);
+            if (data != 0){
+              alert("添加成功");
+              location.href="car.html?uid="+uid;
+            }else {
+              alert("添加失败");
+            }
+          }
+          ,dataType:"text"
+        })
+      })
+    })
+    //修改
+    function editCar(){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=")+1);
+      location.href="edit.html?uid="+uid;
+    }
+  </script>
+</head>
+<body>
+<div id="car"></div>
+<form id="car1">
+  <input type="hidden" name="uid" id="uid"><br>
+  车型：<input type="text" name="carBrand"><br>
+  颜色：<input type="text" name="color">
+  车牌号：<input type="text" name="plateNumber"><br>
+  <button id="addCar">添加车辆信息</button>
+</form>
+</body>
+</html>

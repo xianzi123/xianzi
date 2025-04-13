@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布公告</title>
+    <link rel="stylesheet"  href="css/bootstrap.css"/>
+
+    <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-group textarea {
+            height: 200px;
+        }
+        .input-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-group button:hover {
+            background-color: #0056b3;
+        }
+        #announcement{
+            position: fixed;
+            width:100%;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.2);
+            display: none;
+        }
+        .modal-dialog{
+            position: relative;
+            width: 500px;
+            margin: 0px 100px;
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+    </style>
+    <script>
+        <!--加载用户信息进入页面-->
+        $(function(){
+            $.ajax({
+                url:"selectAnnouncements",
+                type:"post",
+                success:function(data){
+                    var i=1;
+                    for(let aInformation of data){
+                        let s=new Date(aInformation.atime).toLocaleString();
+
+                        let td0='<td><input type="checkbox" ></td>';
+                        let td1=(`<td>${i}</td>`);
+                        i++;
+                        let td2=("<td>"+aInformation.ainformationId+"</td>");
+                        let td3=("<td>"+aInformation.atitle+"</td>");
+                        let td4=("<td>"+aInformation.acontent+"</td>");
+                        let td5=("<td>"+s+"</td>");
+                        let td6=("<td>"+aInformation.recommend+"</td>");
+                        let td7 = ('<td> <a class="viewInf ">查看</a></td>');
+
+                        var tr=$("<tr></tr>");
+                        tr.append(td0);
+                        tr.append(td1);
+                        tr.append(td2);
+                        tr.append(td3);
+                        tr.append(td4);
+                        tr.append(td5);
+                        tr.append(td6);
+                        tr.append(td7);
+
+                        $("#tdata").append(tr);
+                    }
+
+                },
+                error:function(data){
+                    alert("数据加载失败");
+                },
+                dataType:"json"
+            })
+        })
+        //显示增加模态框
+        function  newFile(){
+
+            document.getElementById("announcement").style.display="block";
+        }
+        //发布公告
+        function publishNotice() {
+            let formArray = $("#noticeForm").serializeArray();
+            alert("发布公告");
+            $.ajax({
+                url:"addAnnouncement",
+                type:"post",
+                data:formArray,
+                async: false,
+                success:function(){
+                    alert("发布成功");
+
+                },
+                error:function(data){
+                    alert("数据加载失败");
+                },
+                dataType:"json"
+            })
+        }
+        function hiddenNotice(){
+            document.getElementById("announcement").style.display="none";
+
+        }
+        //删除公告
+        function deleteNotice(){
+            let elementNodeListOf = document.querySelectorAll('input[type="checkbox"]:checked');
+            let aid = "";
+            for(let i=0;i<elementNodeListOf.length;i++){
+                aid+=elementNodeListOf[i].parentNode.nextSibling.nextSibling.innerHTML+",";
+            }
+            alert("选中了"+aid);
+            //发送ajax
+            $.ajax({
+                type:"post",
+                url:"deleteAnnouncement",
+                async: false,
+                data:{"aid":aid},
+                success:function(data){
+                    alert("删除成功");
+                    location.reload();
+                },
+                error:function (){
+                    alert("失败");
+                }
+            })
+
+        }
+    </script>
+</head>
+<body>
+
+<div class="container" style="display: none" id="announcement">
+    <div class="modal-dialog">
+    <h2>发布公告</h2>
+        <form id="noticeForm">
+            <div class="input-group">
+        <label for="title">标题：</label>
+        <input type="text" id="title" name="aTitle" placeholder="请输入公告标题">
+         </div>
+            <div class="input-group">
+        <label for="content">内容：</label>
+        <textarea id="content" name="aContent" placeholder="请输入公告内容"></textarea>
+         </div>
+
+    <div class="input-group">
+        <button onclick="publishNotice()">发布</button>  <button onclick="hiddenNotice()">取消</button>
+    </div>
+        </form>
+    </div>
+</div>
+
+<div >
+    <input type="button" value="新建公告" onclick="newFile()">
+    <input type="button" value="删除公告" onclick="deleteNotice()">
+    <input type="button" value="查看公告" onclick="newFile()">
+</div>
+<table id="tdata" style="border: 1px solid black" cellspacing="2px" width="600px">
+</table>
+
+</body>
+</html>

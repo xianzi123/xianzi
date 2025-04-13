@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户首页</title>
+    <script src="js/jquery.min.js"></script>
+    <script>
+        function getCar(){
+            var urlParam = window.location.search;
+            var uid = urlParam.substring(urlParam.indexOf("=")+1);
+            location.href="car.html?uid="+uid;
+        }
+        function getParkArea(){
+            var urlParam = window.location.search;
+            var uid = urlParam.substring(urlParam.indexOf("=")+1);
+            location.href="parkingArea.html?uid="+uid;
+        }
+    </script>
+</head>
+<body>
+<button onclick="getCar()">车辆信息</button>
+<a href="aInformation.html">公告</a>
+<button onclick="getParkArea()">停车位信息</button>
+</body>
+</html>

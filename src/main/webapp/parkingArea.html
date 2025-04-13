@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>停车位信息</title>
+  <style>
+    .father{
+      width: 450px;
+      height: 400px;
+      display: flex;
+      flex-wrap: wrap;
+      border: #f1d84e 5px solid;
+      margin: 100px auto;
+    }
+    .son{
+      width: 50px;
+      height: 40px;
+      margin: 18px;
+      border: #646161 1px solid;
+    }
+    ul{
+      padding: 0;
+      margin-top: 40px;
+      background-color: #c9c9c9;
+      border: #3c3c3c 1px solid;
+      border-radius: 0 0 10px 10px;
+    }
+    li {
+      list-style: none;
+      width: 50px;
+      height: 20px;
+      border-top: #3c3c3c 1px solid;
+      font-size: 15px;
+      text-align: center;
+      line-height: 20px;
+      margin-right: 50px;
+    }
+    div[id^="hidden"]{
+      display: none;
+    }
+  </style>
+  <script src="js/jquery.min.js"></script>
+  <script>
+    $(function () {
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=") + 1);
+      var areaId = 1;
+      $("h1").html(areaId);
+      getPInformation(uid,areaId);
+      //预约
+      $(".son").click(function (){
+        $(this).children("div").toggle();
+      })
+      $("ul li").click(function (){
+        var parkId = $(this).parent().parent().parent().prop("id");
+        var areaId = $("h1").html();
+        pre(uid,areaId,parkId);
+      })
+    })
+    //预约
+    function pre(uid,areaId,parkId){
+      $.post("prePark",{uid:uid,areaId:areaId,parkId:parkId},function (data){
+        if (data != 0){
+          alert("预约成功");
+          //刷新页面结果
+          // getPInformation(uid,areaId);
+          document.getElementById(parkId).style.backgroundColor='yellow';
+        }else {
+          alert("您的车已有车位或已预约");
+        }
+      })
+    }
+    //下一区域
+    function toNext(){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=") + 1);
+      let areaId = $("h1").html();
+      $.ajax({
+        url:"areaNum",
+        type:"post",
+        success:function (data){
+          let nextAreaId = ++areaId;
+          if (nextAreaId <= data){
+            getPInformation(uid,nextAreaId);
+            $("h1").html(nextAreaId);
+          }else {
+            alert("当前是最后区域");
+          }
+        }
+      })
+    }
+    //上一区域
+    function toPre(){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=") + 1);
+      let areaId = $("h1").html();
+      let preAreaId = --areaId;
+      if (preAreaId > 0){
+        getPInformation(uid,preAreaId);
+        $("h1").html(preAreaId);
+      }else {
+        alert("前面没有更多了");
+      }
+    }
+    //取消预约
+    function delPre(){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=") + 1);
+      var areaId = $("h1").html();
+      $.post("dePrePark",{uid:uid,areaId:areaId},function (data){
+        if (data != 0){
+          alert("取消成功");
+          document.getElementById(data).style.backgroundColor='white';
+        }else {
+          alert("当前区域没有您预约的车位");
+        }
+      })
+    }
+    //获取当前区域车位信息
+    function getPInformation(uid,areaId){
+      $(".son").each(function (index,domEle){
+        let parkId = $(this).prop("id");
+        $(domEle).css("backgroundColor","white");
+        $(this).children().html("<ul><li onclick='pre("+uid+","+areaId+","+parkId+")'>预约</li></ul>");
+      })
+      //获取非空车位
+      $.ajax({
+        url:"getArea",
+        type:"post",
+        data:{areaId:areaId},
+        success(data){
+          for (let i of data){
+            document.getElementById(i).style.backgroundColor='red';
+            //删除非空车位的预约选项
+            $("#hidden"+i).html("");
+          }
+        }
+        ,dataType:"json"
+      })
+      //获取我的车位
+      $.ajax({
+        url:"myPark",
+        type:"post",
+        data:{uid:uid,areaId:areaId},
+        success(data){
+          if (data != 0){
+            document.getElementById(data).style.backgroundColor='green';
+            //添加出库选项
+            $("#hidden"+data).html("<ul><li id='out'>出库</li></ul>");
+            //解绑预约事件
+            $("#out").off("click");
+            //出库
+            $("#out").click(function (){
+              alert("出库");
+              $.post("parkOut",{parkId:data,areaId:areaId,uid:uid},function (data){
+                if (data!=0){
+                  alert("出库成功");
+                  $("#out").parent().html("<li>预约</li>");
+                  getPInformation(uid,areaId);
+                }else {
+                  alert("出库失败");
+                }
+              })
+            })
+          }
+        }
+        ,dataType:"json"
+      })
+      //获取被预约的车位
+      $.ajax({
+        url:"getPre",
+        type:"post",
+        data:{areaId:areaId},
+        success(data){
+          if (data != null){
+            for (let p of data){
+              document.getElementById(p.parkId).style.backgroundColor='yellow';
+            }
+          }
+        }
+        ,dataType:"json"
+      })
+    }
+    //入库
+    function parkIn(){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=") + 1);
+      var areaId = $("h1").html();
+      $.post("parkIn",{uid:uid,areaId:areaId},function (data){
+        if (data != 0){
+          alert("入库成功");
+          getPInformation(uid,areaId);
+        }else {
+          alert("当前区域没有您预约的车位");
+        }
+      })
+    }
+  </script>
+</head>
+<body>
+<h1></h1>
+<div class="father">
+  <div id="1" class="son">
+    <div id="hidden1">
+    </div></div>
+  <div id="2" class="son">
+    <div id="hidden2">
+    </div></div>
+  <div id="3" class="son">
+    <div id="hidden3">
+    </div></div>
+  <div id="4" class="son">
+    <div id="hidden4">
+    </div></div>
+  <div id="5" class="son">
+    <div id="hidden5">
+    </div></div>
+  <div id="6" class="son">
+    <div id="hidden6">
+    </div></div>
+  <div id="7" class="son">
+    <div id="hidden7">
+    </div></div>
+  <div id="8" class="son">
+    <div id="hidden8">
+    </div></div>
+  <div id="9" class="son">
+    <div id="hidden9">
+    </div></div>
+  <div id="10" class="son">
+    <div id="hidden10">
+    </div></div>
+  <div id="11" class="son">
+    <div id="hidden11">
+    </div></div>
+  <div id="12" class="son">
+    <div id="hidden12">
+    </div></div>
+  <div id="13" class="son">
+    <div id="hidden13">
+    </div></div>
+  <div id="14" class="son">
+    <div id="hidden14">
+    </div></div>
+  <div id="15" class="son">
+    <div id="hidden15">
+    </div></div>
+  <div id="16" class="son">
+    <div id="hidden16">
+    </div></div>
+  <div id="17" class="son">
+    <div id="hidden17">
+    </div></div>
+  <div id="18" class="son">
+    <div id="hidden18">
+    </div></div>
+  <div id="19" class="son">
+    <div id="hidden19">
+    </div></div>
+  <div id="20" class="son">
+    <div id="hidden20">
+    </div></div>
+</div>
+<button onclick="toPre()">上一区域</button>
+<button onclick="toNext()">下一区域</button>
+<button onclick="delPre()">取消预约</button>
+<button onclick="parkIn()">确认入库</button>
+</body>
+</html>

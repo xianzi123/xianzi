@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Title</title>
+    <link rel="stylesheet"  href="css/bootstrap.css"/>
+
+    <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+<!--        加载区域信息进入页面-->
+        $(function() {
+            $.ajax({
+                url: "selectAllParkingArea",
+                type: "post",
+                success: function (data) {
+                    var i = 1;
+                    for (let aInformation of data) {
+                        let s = new Date(aInformation.atime).toLocaleString();
+
+                        let td0 = '<td><input type="checkbox" ></td>';
+                        let td1 = (`<td>${i}</td>`);
+                        i++
+                        let td2 = ("<td class='areaId'>" + aInformation.areaId + "</td>");
+                        let td3 = ("<td>" + aInformation.areaName + "</td>");
+                        let td4 = ("<td>" + s + "</td>");
+                        let td5 = ("<td>" + aInformation.remaining + "</td>");
+                        let td6 = ("<td>" + aInformation.totalNumber + "</td>");
+                        let td7 = ("<td>" + aInformation.hourlyPrice + "</td>");
+                        let td8 = ('<td> <a class="viewInf ">编辑</a><button id="deleteButton"  onclick="deleteArea(this)" class="viewInf">删除</button></td>');
+                        var tr = $("<tr></tr>");
+                        tr.append(td0);
+                        tr.append(td1);
+                        tr.append(td2);
+                        tr.append(td3);
+                        tr.append(td4);
+                        tr.append(td5);
+                        tr.append(td6);
+                        tr.append(td7);
+                        tr.append(td8);
+                        $("#areaData").append(tr);
+                    }
+                },
+                dataType:"json"
+            })
+        })
+    function newArea() {
+        document.getElementById("addArea").style.display="block";
+    }
+    function hiddenArea(){
+    document.getElementById("addArea").style.display="none";
+
+
+    }
+    //新增区域
+     function publishArea(){
+    let formArray = $("#areaForm").serializeArray();
+    $.ajax({
+        url:"addParkingArea",
+        type:"post",
+        data:formArray,
+        async: false,
+        success:function(){
+            alert(1);
+            //刷新页面
+            location.reload();
+            alert("发布成功");
+
+        },
+        error:function(){
+            alert("数据加载失败");
+        },
+        dataType:"json"
+    })
+     }
+     //删除区域
+     function deleteArea(e){
+        //获取tr标签下class为areaId的标签内容
+
+         console.log(e.parentNode.parentNode.querySelector(".areaId").innerHTML);
+        let aid = e.parentNode.parentNode.querySelector(".areaId").innerHTML;
+        alert("选中了"+aid+"区域");
+        //发送ajax
+        $.ajax({
+            type:"post",
+            url:"deleteParkingArea",
+            async: false,
+            data:{"aid":aid},
+            success:function(data){
+                alert("删除成功");
+                location.reload();
+            },
+            error:function (){
+                alert("失败");
+            }
+        })
+    }
+
+    </script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        #areaData{
+            width: 100%;
+            border: #DCDFE6 1px solid;
+
+        }
+        #areaData tr{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #areaData tr th{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #areaData tr td{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #areaData tr:first-child{
+           background-color: #F8F8F8;
+        }
+        #addArea{
+            position: fixed;
+            width:100%;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.2);
+            display: none;
+        }
+        .modal-dialog{
+            position: relative;
+            width: 500px;
+            margin: 0px 100px;
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<!--增加区域模态框-->
+<div class="container" style="display: none" id="addArea">
+    <div class="modal-dialog">
+        <h2>新增区域</h2>
+        <form id="areaForm">
+            <div class="input-group">
+                <label for="title">区域名称：</label>
+                <input type="text" id="title" name="areaName" placeholder="请输入区域名称">
+            </div>
+            <div class="input-group">
+                <label for="total">车位总数：</label>
+                <input type="text" id="total" name="totalNumber" placeholder="车位数量">
+            </div>
+            <div class="input-group">
+                <label for="price">每小时价格：</label>
+                <input type="text" id="price" name="hourlyPrice">
+            </div>
+
+            <div class="input-group">
+                <button onclick="publishArea()">发布</button>  <button onclick="hiddenArea()">取消</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!---->
+<div >
+    <input type="button" value="新建区域" onclick="newArea()">
+<!--    <input type="button" value="删除区域" onclick="deleteArea()">-->
+</div>
+<table id="areaData" >
+<!--    表头-->
+
+    <tr>
+        <th>
+            <input type="checkbox" >
+        </th>
+        <th>序号</th>
+        <th>区域编号</th>
+        <th>区域名称</th>
+        <th>创建时间</th>
+        <th>剩余车位</th>
+        <th>总车位</th>
+        <th>每小时价格</th>
+        <th>操作</th>
+    </tr>
+</table>
+
+</body>
+</html>

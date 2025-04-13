@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订单信息</title>
+    <script src="js/jquery.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        #content{
+            width: 100%;
+            border: #DCDFE6 1px solid;
+
+        }
+        #content tr{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #content tr th{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #content tr td{
+            font-size: 25px;
+            height: 50px;
+            padding: 8px;
+            border: #DCDFE6 1px solid;
+        }
+        #content tr:first-child{
+            background-color: #F8F8F8;
+        }
+    </style>
+</head>
+<body>
+<script>
+    $(function () {
+        $.ajax({
+            url: "selectAllOrder",
+            type: "post",
+            success: function (data) {
+                for (let parkOrder of data) {
+                    let start = new Date(parkOrder.startTime).toLocaleString();
+                    let end = new Date(parkOrder.endTime).toLocaleString();
+                    let number = parseInt((parkOrder.endTime-parkOrder.startTime)/1000/60/60);
+                    alert(number+"小时");
+                    let areaId = parkOrder.areaId;
+                    // let parkMoney1 = parkMoney(number,areaId);
+                    let tr = $("<tr></tr>");
+                    let td1 = $("<td>" + parkOrder.oid+ "</td>");
+                    let td2 = $("<td>" + parkOrder.uname + "</td>");
+                    let td3 = $("<td>" + start + "</td>");
+                    let td4 = $("<td>" + end + "</td>");
+                    let td5 = $("<td>" + parkOrder.plateNumber + "</td>");
+                    let td7 = $("<td>" + parkOrder.areaId+ "</td>");
+                    let td6 = $("<td>" + parkOrder.parkMoney+ "</td>");
+
+                    // let td4 = $("<td><input type='button' value='查看' onclick='selectText(" +.ainformationId + ")'></td>")
+                    tr.append(td1);
+                    tr.append(td2);
+                    tr.append(td3);
+                    tr.append(td4);
+                    tr.append(td5);
+                    tr.append(td6);
+                    tr.append(td7);
+                    $("#content").append(tr);
+                }
+            },
+            dataType: "json"
+        })
+
+    })
+    // function parkMoney(number,areaid){
+    //
+    //     $.ajax({
+    //         type:"post",
+    //         url:"getParkingAreaPrice",
+    //         async: false,
+    //         data:{"areaId":areaid},
+    //         success:function(data){
+    //             let number1 = data*number;
+    //            result(number1);
+    //         },
+    //         error:function (){
+    //             alert("失败");
+    //         }
+    //     })
+
+        // return data*number;
+
+    // }
+    // function result(number1){
+    //     return number1
+    // }
+// function selectText(ainformationId){
+// $.post("selectContent",{aid:ainformationId},function (data){
+// $("#content").text().clear;
+// $("#content").text(data);
+// },"text");
+// $("#content").show();
+// }
+</script>
+</head>
+
+<table id="content">
+    <tr>
+        <th>编号</th>
+        <th>用户名</th>
+        <th>开始时间</th>
+        <th>结束时间</th>
+        <th>车牌号</th>
+        <th>费用</th>
+        <th>所在区域</th>
+    </tr>
+</table>
+</body>
+</html>

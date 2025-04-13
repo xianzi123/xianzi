@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        function registerUser() {
+            //获取表单数据
+            let formArray = $("#register").serializeArray();
+            //发送ajax请求
+            $.ajax({
+                type:"post",
+                url:"registerFrom",
+                data:formArray,
+                success:function(data){
+                    if(data==1){
+                        alert("添加成功！");
+                        window.location.href = "login.html";
+                    }
+                },
+                error:function(){
+                    alert("系统异常稍后重试！")
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<form id="register" method="post">
+    <h2>用户注册</h2>
+    <label for="uname">用户名:</label>
+    <input type="text" id="uname" name="uname" required>
+    <label for="upassword">密码:</label>
+    <input type="password" id="upassword" name="upassword" required>
+    <label for="uphone">电话:</label>
+    <input type="tel" id="uphone" name="uphone" required>
+
+    <label for="sex">车牌号:</label>
+    <input type="tel" id="plate" name="platePhone" required>
+
+    <label for="sex">性别:</label>
+    <select id="sex" name="sex" required>
+        <option value="male">男</option>
+        <option value="female">女</option>
+    </select>
+    <input type="button" onclick="registerUser()" value="注册">
+</form>
+</body>
+</html>

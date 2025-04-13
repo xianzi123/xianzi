@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>公告信息</title>
+  <script src="js/jquery.min.js"></script>
+  <style>
+    #content{
+      width: 400px;
+      height: 250px;
+      background-color: white;
+      border: 1px solid #8d7d23;
+      border-radius: 10px;
+      position: absolute;
+      top: 120px;
+      left: 550px;
+      z-index: 2;
+      display: none;
+    }
+  </style>
+  <script>
+    $(function (){
+      $.ajax({
+        url:"AInformation",
+        type:"post",
+        success:function (data){
+          for (let ai of data){
+            let tr = $("<tr></tr>");
+            let td1 = $("<td>"+ai.ainformationId+"</td>");
+            let td2 = $("<td>"+ai.atitle+"</td>");
+            let td3 = $("<td>"+ai.atime+"</td>");
+            let td4 = $("<td><input type='button' value='查看' onclick='selectText("+ai.ainformationId+")'></td>")
+            tr.append(td1);
+            tr.append(td2);
+            tr.append(td3);
+            tr.append(td4);
+            $("#ai").append(tr);
+          }
+        },
+        dataType:"json"
+      })
+    })
+    function selectText(ainformationId){
+      $.post("selectContent",{aid:ainformationId},function (data){
+        $("#content").text().clear;
+        $("#content").text(data);
+      },"text");
+      $("#content").show();
+    }
+  </script>
+</head>
+<body>
+<table id="ai" width="500" border="1" align="center">
+  <div id="content"></div>
+  <tr>
+    <th>编号</th>
+    <th>标题</th>
+    <th>发布时间</th>
+    <th>操作</th>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员首页</title>
+    <link rel="stylesheet"  href="css/bootstrap.css"/>
+
+    <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/userInformationManage.css">
+    <script>
+        <!--加载用户信息进入页面-->
+        $(function(){
+            $.ajax({
+                url:"selectUser",
+                type:"post",
+                success:function(data){
+                    // alert(data);
+                    var i=1;
+                    for(let user of data){
+
+                        let td0='<td><input type="checkbox"></td>';
+                        let td1=(`<td>${i}</td>`);
+                        i++;
+                        let td2=("<td>"+user.uid+"</td>");
+                        let td3=("<td>"+user.uname+"</td>");
+                        let td4=("<td>"+user.uphone+"</td>");
+                        let td5=("<td>"+user.platePhone+"</td>");
+                        let td6=("<td>"+user.sex+"</td>");
+                        let td7 = ('<td> <a class="viewInf ">查看</a><a class="updateInf ">修改</a> </td>');
+
+                        var tr=$("<tr></tr>");
+                        tr.append(td0);
+                        tr.append(td1);
+                        tr.append(td2);
+                        tr.append(td3);
+                        tr.append(td4);
+                        tr.append(td5);
+                        tr.append(td6);
+                        tr.append(td7);
+
+                        $("#tdata").append(tr);
+                    }
+                },
+                error:function(data){
+                    alert("数据加载失败");
+                },
+                dataType:"json"
+            })
+        })
+        //   增加用户
+        function addUser(){
+            //获取表单数据
+            let formArray = $("#addUser").serializeArray();
+            // alert(formArray);
+            //发送ajax请求
+            $.ajax({
+                type:"post",
+                url:"addUser",
+                async: false,
+                data:formArray,
+                success:function(data){
+                    if(data==1){
+                        alert("添加成功！");
+                        // window.location.href = "managerTest.html";
+                    }
+                },
+                error:function(data){
+                    alert("系统异常稍后重试！")
+                },
+                dataType:"json"
+            })
+        }
+        //删除用户
+        function deleteUser(){
+            //获取选中的id
+            let checkbox = $("input[type='checkbox']:checked");
+
+            let uid = "";
+            for(let i=0;i<checkbox.length;i++){
+                uid+=checkbox[i].parentNode.nextSibling.nextSibling.innerHTML+",";
+            }
+            alert("选中了"+uid);
+            //发送ajax请求
+            $.ajax({
+                type:"post",
+                url:"deleteUser",
+                async: false,
+                data:{"uid":uid},
+                success:function(data){
+                    alert("删除成功");
+                    location.reload();
+                },
+                error:function (){
+                    alert("失败");
+                }
+            })
+        }
+        //更新用户
+        function updateUser(){
+            //获取表单数据
+            let formArray = $("#updateUser").serializeArray();
+            // alert(formArray);
+            //发送ajax请求
+            $.ajax({
+                type:"post",
+                url:"updateUser",
+                async: false,
+                data:formArray,
+                success:function(data){
+                    if(data==1){
+                        alert("更改成功！");
+                        // window.location.href = "managerTest.html";
+                    }
+                },
+                error:function(){
+                    alert("更改失败")
+                },
+                dataType:"json"
+            })
+        }
+    </script>
+
+</head>
+
+<body>
+
+<div class="wrapperBox">
+    <div class="header">
+        <div class="headerTitle">
+            <div class="headerLine">停车场信息管理系统</div>
+<!--            <div >停车场信息管理系统</div>-->
+        </div>
+        <div class="headerButton">
+            <button class="addButton">新增</button>
+            <button id="deleteButton"  onclick="deleteUser()">删除</button>
+        </div>
+    </div>
+    <div class="container">
+        <table id="containerTable">
+            <thead class="tableHeaher">
+            <tr>
+                <th><input type="checkbox"></th>
+                <th>序号</th>
+                <th>id</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>车牌号</th>
+                <th>性别</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+
+            <tbody id="tdata">
+            </tbody>
+
+            <tfoot>
+            </tfoot>
+
+            </tbody>
+
+        </table>
+        <!--增加的模态框-->
+        <div class="modal addfade" id="addmodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <i>X</i>
+                        <h4>新增用户信息</h4>
+                    </div>
+                    <form class="modal-body" id="addUser">
+
+                        <!--            <p>序号：<input type="text" name="order"/>-->
+                        <!--            <p>id：<input type="text" name="uid"/>-->
+                        <p>姓名：<input type="text" name="uname"/></p>
+                        <p>手机号：<input type="text" name="uphone"/></p>
+                        <p>车牌号：<input type="text" name="platePhone"/></p>
+                        <p>性别：<input type="text" name="sex"/></p>
+                        <div class="modal-footer">
+                            <div class="pageInfoBox"></div>
+                            <button onclick="addUser()" class="addButton_ok">确定</button>
+                            <button class="addButton_no">取消</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--修改的模态框-->
+        <div class="modal movefade movemodal" id="movemodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <i>X</i>
+                        <h4>修改学生信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!--            <p>序号：<input type="text" />-->
+                        <!--            <p>id：<input type="text" />-->
+                        <form id="updateUser">
+                            <p><input type="hidden" name="uid"/></p>
+                            <p>姓名：<input type="text" name="uname"/></p>
+                            <p>手机号：<input type="text" name="uphone"/></p>
+                            <p>车牌号：<input type="text" name="platePhone"/></p>
+                            <p>性别：<input type="text" name="sex"/></p>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="updateUser()" class="updatabtn_ok">保存</button>
+                        <button class="updatabtn_no">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--查看的模态框-->
+        <div class="modal viewfade" id="viewmodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <i>X</i>
+                        <h4>查看学生信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            序号：<input type="text" class="viewStyle" disabled="disabled" />
+                        </p>
+                        <p>id：<input type="text" /></p>
+                        <p>姓名：<input type="text" /></p>
+                        <p>手机号：<input type="text" /></p>
+                        <p>车牌号：<input type="text" /></p>
+                        <p>性别：<input type="text" /></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="addButton_no">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="pageInformation">
+            第<span id="curPage"></span>页，
+            共<span id="countPage"></span>条，(每页显示10条)
+            <input id="page" type="text"style="display: none" >
+        </div>
+        <div class="pageButton">
+            <button id="prePageButton">上一页</button>
+            <button id="nextPageButton">下一页</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!--<script>-->
+<!--    var currentUrl = window.location.href;-->
+<!--    document.getElementById("username").innerText = "管理员"+currentUrl.split("=")[1];-->
+<!--</script>-->
+<script src="js/userInformationManage.js"></script>
+
+
+</body>
+
+
+
+</html>
+
+
+

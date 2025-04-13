@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>智慧停车信息管理系统</title>
+  <link rel="stylesheet"  href="css/bootstrap.css"/>
+
+  <script src="webjars/jquery/3.5.1/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      var height=document.documentElement.clientHeight;
+      document.getElementById('iframe-page-content').style.height=height+'px';
+    });
+    var menuClick = function(menuUrl) {
+      $("#iframe-page-content").attr('src',menuUrl);
+    };
+  </script>
+</head>
+<body>
+
+<!--上下导航栏-->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"><img src="img/商标.png" width="20px" height="20px"></a>
+      <p class="navbar-text" >智慧停车管理系统</p>
+      <p class="navbar-text" id="username"></p>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="login.html">退出 <span class="sr-only">(current)</span></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+<!--左右导航栏-->
+<div style="width: 100%">
+  <!-- 左侧菜单栏 -->
+  <div id="main-container">
+    <div id="sidebar" class="col-md-2 column">
+      <!-- 创建菜单树 -->
+      <div class="col-md-12">
+        <ul id="main-nav" class="nav nav-tabs nav-stacked" style="">
+          <!--用户管理-->
+          <li>
+            <a href="#systemSetting" class="nav-header collapsed" data-toggle="collapse">
+              <i class="glyphicon glyphicon-cog"></i>用户管理
+              <span class="pull-right glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <ul id="systemSetting" class="nav nav-list collapse secondmenu" style="height: 0px;">
+              <li><a href="#" onclick="menuClick('manager.html')"><i class="glyphicon glyphicon-user"></i>用户管理</a></li>
+              <li><a href="#" onclick="menuClick('${base}toTestList')"><i class="glyphicon glyphicon-th-list"></i>管理员</a></li>
+            </ul>
+          </li>
+<!--          2、系统管理-->
+          <li>
+            <a href="#systemSetting1" class="nav-header collapsed" data-toggle="collapse">
+              <i class="glyphicon glyphicon-cog">区域管理</i>
+              <span class="pull-right glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <ul id="systemSetting1" class="nav nav-list collapse secondmenu" style="height: 0px;">
+              <li><a href="#" onclick="menuClick('parkArea.html')"><i class="glyphicon glyphicon-asterisk"></i>区域管理</a></li>
+              <li><a href="#"><i class="glyphicon glyphicon-edit"></i>新增区域</a></li>
+
+            </ul>
+          </li>
+
+          <li>
+            <a href="#" onclick="menuClick('parkOrder.html')" class="nav-header collapsed" data-toggle="collapse">
+              <i class="glyphicon glyphicon-cog"></i>订单管理
+            </a>
+
+          </li>
+
+          <li>
+            <a href="#" onclick="menuClick('information.html')" class="nav-header collapsed" data-toggle="collapse">
+              <i class="glyphicon glyphicon-cog"></i>平台公告
+            </a>
+
+          </li>
+<!--          <li>-->
+<!--            <a href="#" class="nav-header collapsed" data-toggle="collapse">-->
+<!--              <i class="glyphicon glyphicon-cog">平台公告</i>-->
+<!--            </a>-->
+
+<!--          </li>-->
+
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-10 column">
+      <div class="breadcrumbs" id="breadcrumbs">
+        <!-- 面包屑导航 -->
+        <ul class="breadcrumb">
+          <li>
+            <a href="${base}toLoginIndex">用户管理</a>
+          </li>
+          <li class="active">Dashboard</li>
+        </ul>
+      </div>
+
+      <!-- 内容展示页 -->
+      <div>
+        <iframe id="iframe-page-content" src="index.jsp" width="100%"  frameborder="no" border="0" marginwidth="0" marginheight=" 0" scrolling="no" allowtransparency="yes"></iframe>
+      </div>
+    </div><!-- /.main-content -->
+  </div><!-- /.main-container -->
+</div>
+<script>
+  var currentUrl = window.location.href;
+  document.getElementById("username").innerText = "管理员"+currentUrl.split("=")[1];
+</script>
+</body>
+</html>

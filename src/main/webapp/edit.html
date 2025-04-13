@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>修改</title>
+  <script src="js/jquery.min.js"></script>
+  <script>
+    $(function (){
+      var urlParam = window.location.search;
+      var uid = urlParam.substring(urlParam.indexOf("=")+1);
+      $("#uid").val(uid);
+      $.ajax({
+        url:"getCar",
+        type:"post",
+        data:{uid:uid},
+        success:function (data){
+          $("#carBrand").val(data.carBrand);
+          $("#color").val(data.color);
+          $("#plateNumber").val(data.plateNumber);
+        }
+      })
+    })
+  </script>
+</head>
+<body>
+<form action="updateCar" method="post">
+  <input type="hidden" name="uid" id="uid"><br>
+  车型：<input type="text" name="carBrand" id="carBrand"><br>
+  颜色：<input type="text" name="color" id="color">
+  车牌号：<input type="text" name="plateNumber" id="plateNumber"><br>
+  <button type="submit" id="update">确认修改</button>
+</form>
+</body>
+</html>
